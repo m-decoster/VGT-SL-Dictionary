@@ -23,7 +23,7 @@ In this repository, you will find:
 This demo has been repurposed for several events. Some of these events were in Dutch, some in English.
 
 - `DagVanDeWetenschap2023` branch [Dutch]: For the Dag Van De Wetenschap on November 26th 2023.
-- `SignON_EASIER_EC` branch [English]: For the SignON - EASIER workshop at the European Commission on November 29th 2023. TBA.
+- `SignON_EASIER_EC` branch [English]: For the SignON - EASIER workshop at the European Commission on November 29th 2023.
 
 ## Installation
 
