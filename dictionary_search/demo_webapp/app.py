@@ -61,4 +61,4 @@ def search() -> Response:
 
 
 if __name__ == '__main__':
-    app.run(debug=False, threaded=False, host='localhost', port='5000')
+    app.run(debug=False, threaded=False, host='localhost', port=5000)
