@@ -103,7 +103,7 @@ To create the database, run `scripts/create_db.py` in the virtual environment or
 This script should be fairly self-explanatory: it uses the provided ONNX model to convert the videos in one folder
 to embeddings in another.
 
-## LICENCE
+## License
 
 The code in this repository is licensed under the MIT license. See `LICENSE`.
 
