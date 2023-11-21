@@ -213,7 +213,6 @@ continueButton.addEventListener("click", () => {
 
     clipLandmarks = [];
     currentGlossIndex = random(0, glosses.length);
-    console.log(currentGlossIndex);
     updateGloss();
 }, false);
 
@@ -292,6 +291,8 @@ function setResults(results) {
         let prefix = result.slice(0, 2);
         let url = 'https://vlaamsegebarentaal.be/signbank/dictionary/protected_media/glossvideo/' + prefix + '/' + result + '.mp4';
 
+        let resultCorrect = result === id_glosses[currentGlossIndex];
+
         let rawGloss = result.slice(0, result.indexOf("-"));
         let numericId = result.slice(result.lastIndexOf("-") + 1);
         rawGloss = rawGloss.charAt(0) + rawGloss.substring(1).toLowerCase();
@@ -303,6 +304,9 @@ function setResults(results) {
         var resultGloss = document.createElement("h5");
         resultGloss.innerHTML = rawGloss;
         resultGloss.classList.add("card-title");
+        if (resultCorrect) {
+            resultGloss.classList.add("correct");
+        }
         var resultLink = document.createElement("a");
         resultLink.href = "https://woordenboek.vlaamsegebarentaal.be/gloss/" + rawGloss + "?sid=" + numericId;
         resultLink.innerHTML = "Details";

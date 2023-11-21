@@ -66,3 +66,7 @@ button {
   text-align: center;
   vertical-align: center;
 }
+
+.correct {
+    color: rgb(0, 100, 0);
+}
