@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>VGT Woordenboek Zoekfunctie: Uitleg</title>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">VGT Woordenboek Zoekfunctie (Uitleg)</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Prototype</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex">
+            <b>AIRO</b>&nbsp;&nbsp;&nbsp;&nbsp;
+            <b>IDLab</b>&nbsp;&nbsp;&nbsp;&nbsp;
+            <b>UGent</b>&nbsp;&nbsp;&nbsp;&nbsp;
+            <b>imec</b>&nbsp;&nbsp;&nbsp;&nbsp;
+            <b>FWO</b>&nbsp;&nbsp;&nbsp;&nbsp;
+            <b>SignON</b>
+        </div>
+    </div>
+</nav>
+<div id="explanation">
+    <h2>Dit is hoe het werkt...</h2>
+
+    <p>
+        Het <a href="https://woordenboek.vlaamsegebarentaal.be/">Woordenboek Vlaamse Gebarentaal-Nederlands (VGT-NL)</a>
+        bevat meer dan tienduizend gebaren! Je kan er tekst ingeven en de relevante gebaren terugvinden. Zo kan je
+        er bijvoorbeeld leren hoe je "kat" kan gebaren, of hoe je je geboortestad gebaart.<br/>
+        Wat je nog niet kan doen in het woordenboek, is een gebaar ingeven en de betekenis ervan te weten komen.
+        Jammer, toch?<br/>
+        Deze demo toont een prototype van deze functionaliteit.
+    </p>
+    <p style="text-align: center">
+        <img width="50%" src="dictionary_frontpage.png"/>
+    </p>
+
+    <p>
+        Om deze demo te maken, gebruiken we artificiële intelligentie. Meer bepaald maken we gebruik van
+        <b>diepe neurale netwerken</b>. Ons netwerk heet Maia en Maia leert gebaren herkennen.
+        Ze doet dit door naar heel veel voorbeelden van gebaren te kijken en te ontdekken waaruit deze gebaren bestaan.
+    </p>
+
+    <p>
+        In het woordenboek hebben we tienduizend gebaren, maar van elk gebaar maar één voorbeeld. Maia is wel slim,
+        maar ze heeft meer voorbeelden nodig dan dit! Daarom gebruiken we andere video's
+        om haar gebarentaal aan te leren. Dit is het <a href="https://corpusvgt.be/">VGT corpus</a>
+        en dit corpus bevat voor verschillende gebaren heel wat voorbeelden.
+    </p>
+
+    <p>
+        Als eerste stap analyseren we de bewegingen en handvormen in de video's. Met behulp van
+        <a href="https://google.github.io/mediapipe/solutions/holistic.html">MediaPipe Holistic</a>, technologie
+        die ook in jouw smartphone zit, gaan we de video's verwerken om er een soort van "poppetjes" uit te halen.
+        Kijk maar eens naar deze live demo. Zwaai maar eens!
+    </p>
+
+     <div id="liveView" class="videoView">
+      <div style="position: relative;">
+        <video id="webcam" style="width: 1280px; height: 720px; position: abso" autoplay playsinline></video>
+        <canvas class="output_canvas" id="output_canvas" width="1280" height="720" style="position: absolute; left: 0px; top: 0px;"></canvas>
+      </div>
+    </div>
+    <script type="module" src="mediapipe_demo.js"></script>
+
+    <p>
+        Er is nog één probleem: we kunnen Maia niet alle gebaren in VGT aanleren: daarvoor hebben
+        we niet genoeg voorbeelden. Gelukkig heeft ze wel geleerd om handvormen en bewegingen te herkennen.
+        Deze demo vergelijkt de handvormen en bewegingen in jouw zoekopdracht met die in het woordenboek
+        om zo gelijkaardige gebaren te vinden. Zo doorzoekt Maia de meer dan tienduizend gebaren in het woordenboek
+        VGT-NL in een ogenblik!
+    </p>
+
+    <h3>Technologie</h3>
+    <p>Dit prototype maakt gebruik van de volgende technologieën:</p>
+    <ul>
+        <li>De programmeertaal <b>Python</b></li>
+        <li>Het raamwerk <b>MediaPipe Holistic</b></li>
+        <li>Het machine learning raamwerk <b>PyTorch</b> en <b>ONNX</b></li>
+        <li>Het web raamwerk <b>Flask</b></li>
+    </ul>
+</div>
+
+<footer>
+This demo application was developed by <a href="https://users.ugent.be/~mcdcoste/research.html">Mathieu De Coster</a> at <a href="airo.ugent.be">IDLab-AIRO</a>.
+    Mathieu's research is funded by <a href="fwo.be">FWO Vlaanderen</a>.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

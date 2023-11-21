@@ -1,0 +1,68 @@
+body {
+    margin-left: 15%;
+    margin-right: 15%;
+    margin-top: 2%;
+    font-family: 'Lato', sans-serif;
+}
+
+#explanation {
+    margin-left: 15%;
+    margin-right: 15%;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+}
+
+h1,h2,h3,h4 {
+    margin-top: 20px;
+}
+
+.active {
+    border: 5px solid red;
+}
+
+#spinner {
+    text-align: center;
+}
+
+footer {
+    margin-top: 4%;
+    font-size: small;
+    margin-bottom: 1%;
+}
+
+button {
+    margin-bottom: 3%;
+}
+
+#menu {
+    text-align: center;
+    margin-top: 4%;
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+#countdown {
+  opacity:    0.75;
+  background: #000;
+  width:      100%;
+  height:     100%;
+  z-index:    10;
+  top:        0;
+  left:       0;
+  position:   fixed;
+
+  font-size: 40rem;
+  text-align: center;
+  vertical-align: center;
+}
