@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <title>VGT Woordenboek Zoekfunctie</title>
+    <title>VGT Dictionary Search</title>
 
     <script src="mediapipe/camera_utils.js" crossorigin="anonymous"></script>
     <script src="mediapipe/control_utils.js" crossorigin="anonymous"></script>
@@ -22,7 +22,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">VGT Woordenboek Zoekfunctie (Prototype)</a>
+        <a class="navbar-brand" href="#">VGT Dictionary Search (Prototype)</a>
         <div class="d-flex">
             <b>AIRO</b>&nbsp;&nbsp;&nbsp;&nbsp;
             <b>IDLab</b>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -58,29 +58,14 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <h3>Deelname</h3>
-                <p>De video-opnames die in deze demo gemaakt worden, worden niet door ons bewaard!
-                    Om de kwaliteit van dit prototype beter te kunnen analyseren, willen we wel graag een eenvoudige
-                    en <b>anonieme</b> voorstelling hiervan bijhouden. Deze ziet er zo uit.</p>
-
-                <p>Jouw deelname aan deze demo is volledig vrijwillig en je kan deze op eender welk moment stopzetten.</p>
-                <p><b>Door deze demo te gebruiken, ga je akkoord dat deze voorstelling wordt opgeslagen.</b></p>
-            </div>
-            <div class="col">
-                <img class="center" src="pose_landmarks_index.png" alt="pose keypoints"/>
-                <!-- Image source: https://developers.google.com/mediapipe/solutions/vision/pose_landmarker/ -->
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <h3>Voorbeeld</h3>
+                <h3>Example</h3>
                 <p><span id="exampleGlossName"></span></p>
                 <video id="example" width="400" height="400" controls></video>
             </div>
             <div class="col">
                 <h3>Camera</h3>
-                <button type="button" class="btn btn-primary" id="startButton">Neem op</button>&nbsp;
-                <button type="button" class="btn btn-primary" id="continueButton">Nog een gebaar!</button>
+                <button type="button" class="btn btn-primary" id="startButton">Record</button>&nbsp;
+                <button type="button" class="btn btn-primary" id="continueButton">Go again!</button>
                 <div style="position: relative;">
                     <video id="preview" width="400" height="400" autoplay muted></video>
                 </div>
@@ -91,11 +76,11 @@
 </div>
 <div id="menu">
     <div class="row">
-        <h2>Resultaten</h2>
+        <h2>Results</h2>
     </div>
 
     <div id="spinner" class="visually-hidden spinner-border" role="status">
-        <span class="visually-hidden">Laden...</span>
+        <span class="visually-hidden">Loading...</span>
     </div>
     <div id="results" class="container">
         <div class="row" id="row0">
@@ -126,10 +111,10 @@
 </div>
 
 <footer>
-    Dit prototype werd ontwikkeld door <a href="https://users.ugent.be/~mcdcoste">Mathieu De
-    Coster</a> bij <a href="https://airo.ugent.be">IDLab-AIRO</a> (<a href="https://ugent.be">UGent</a>-<a
+    This prototype was developed by <a href="https://users.ugent.be/~mcdcoste">Mathieu De
+    Coster</a> at <a href="https://airo.ugent.be">IDLab-AIRO</a> (<a href="https://ugent.be">UGent</a>-<a
         href="https://www.imec-int.com/en">imec</a>).
-    Zijn onderzoek wordt gefinancierd door <a href="https://www.fwo.be">FWO Vlaanderen</a>.
+    His research is financed by <a href="https://www.fwo.be">FWO Vlaanderen</a>.
 </footer>
 
 <script src="record.js"></script>

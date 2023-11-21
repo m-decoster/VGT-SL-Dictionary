@@ -118,26 +118,26 @@ let countdownDisplay = document.getElementById("countdown");
 
 // Dutch translation of the ID Glosses that we record.
 let glosses = [
-    "Bouwen",
-    "Waarom",
-    "Hebben",
-    "Paard",
-    "Melk",
-    "Herfst",
-    "Valentijn",
-    "Telefoneren",
-    "Straat",
-    "Haas",
-    "Hond",
-    "Rusten",
-    "School",
-    "Onthouden",
-    "Wat",
-    "Vliegtuig",
-    "Bel",
-    "Kat",
-    "Mama",
-    "Papa"
+    "Bouwen (To build)",
+    "Waarom (Why)",
+    "Hebben (To have)",
+    "Paard (Horse)",
+    "Melk (Milk)",
+    "Herfst (Autumn)",
+    "Valentijn (Valentine's day)",
+    "Telefoneren (To call)",
+    "Straat (Street)",
+    "Haas (Hare)",
+    "Hond (Dog)",
+    "Rusten (To rest)",
+    "School (School)",
+    "Onthouden (To memorise)",
+    "Wat (What)",
+    "Vliegtuig (Airplane)",
+    "Bel (Bell)",
+    "Kat (Cat)",
+    "Moeder (Mother)",
+    "Vader (Father)"
 ];
 
 // ID Glosses that we record. Order should be the same as `glosses`.
@@ -272,7 +272,7 @@ function search() {
     // Send the keypoint data to the server and get a response back...
     fetch('http://localhost:5000/search?' + new URLSearchParams({
             gtgloss: id_glosses[currentGlossIndex],
-        }), { method: "POST", body: clipLandmarks, headers: {'CONSENT': true} })
+        }), { method: "POST", body: clipLandmarks, headers: {'CONSENT': false} })
         .then(response => {
             if (response.ok) {
                 return response;

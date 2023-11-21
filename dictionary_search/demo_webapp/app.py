@@ -1,7 +1,4 @@
 import argparse
-import json
-import os
-import uuid
 from typing import List, Dict, Tuple
 
 import numpy as np
@@ -40,14 +37,6 @@ def search() -> Response:
 
     embedding: np.ndarray = model.get_embedding(features)
     search_results: List[Tuple[str, float]] = database.get_results(embedding)
-
-    unique_filename: uuid.UUID = uuid.uuid4()
-    np.save(os.path.join(args.data_store, str(unique_filename)), features)
-
-    with open(os.path.join(args.data_store, str(unique_filename) + '.json'), 'w') as metadata_file:
-        json.dump({'ground_truth': request.args.get('gtgloss'),
-                   'keypoints_file': str(unique_filename),
-                   'predictions': search_results}, metadata_file)
 
     # Return search results.
     response: Dict[str, List[str]] = {
