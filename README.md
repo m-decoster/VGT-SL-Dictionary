@@ -1,4 +1,4 @@
-# Dag Van De Wetenschap 2023
+# Flemish Sign Language Dictionary Search Functionality Prototype
 
 At
 the [Dag Van De Wetenschap 2023](https://www.dagvandewetenschap.be/activiteiten/universiteit-gent-kunnen-computers-gebarentaal-begrijpen-op-locatie), [IDLab-AIRO](https://airo.ugent.be/)
