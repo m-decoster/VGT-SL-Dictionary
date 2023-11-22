@@ -118,8 +118,10 @@ def main(input_directory: str, db_directory: str, model_path: str, k: int, n: in
     print(f'Average look-up time: {1000 * (end_time - start_time) / len(query_filenames):.4f} ms')
 
     # In corpus versus not in corpus.
-    incorpus = ['HEBBEN-A-4801', 'PAARD-A-8880', 'STRAAT-A-11560', 'HAAS-A-16146', 'TELEFONEREN-D-11870']
-    notincorpus = ['BOUWEN-G-1906', 'WAAROM-A-13564', 'MELK-B-7418', 'VALENTIJN-A-16235', 'HERFST-B-4897']
+    incorpus = ['HEBBEN-A-4801', 'PAARD-A-8880', 'STRAAT-A-11560', 'HAAS-A-16146', 'TELEFONEREN-D-11870',
+                'HOND-A-5052', 'RUSTEN-B-10250', 'SCHOOL-A-10547', 'ONTHOUDEN-A-8420', 'WAT-A-13657']
+    notincorpus = ['BOUWEN-G-1906', 'WAAROM-A-13564', 'MELK-B-7418', 'VALENTIJN-A-16235', 'HERFST-B-4897',
+                   'VLIEGTUIG-B-13187', 'KLEPELBEL-A-1166', 'POES-G-9372', 'MOEDER-A-7676', 'VADER-G-8975']
     correct_incorpus = np.zeros((k,))
     correct_notincorpus = np.zeros((k,))
     total_incorpus = 0
@@ -140,8 +142,8 @@ def main(input_directory: str, db_directory: str, model_path: str, k: int, n: in
     print(f'Not in corpus top-{k} accuracy: {print_list(correct_notincorpus / total_notincorpus)}')
 
     # Per class accuracy.
-    correct = {label.gloss: np.zeros((k,)) for label in _DATABASE[:10]}
-    total = {label.gloss: 0 for label in _DATABASE[:10]}
+    correct = {label.gloss: np.zeros((k,)) for label in _DATABASE[:20]}
+    total = {label.gloss: 0 for label in _DATABASE[:20]}
     for filename in query_filenames:
         label, results = search(filename, model, k)
         for i, result in enumerate(results):
