@@ -1,6 +1,7 @@
 import dataclasses
 import glob
 import os
+import random
 from typing import List, Tuple
 
 import numpy as np
@@ -11,6 +12,21 @@ from tqdm import tqdm
 class DatabaseEntry:
     embedding: np.ndarray
     gloss: str
+
+# We do not want certain glosses to be included, because they are place names or may otherwise be unsuitable for
+# this demo.
+UNWANTED_GLOSSES = [
+    'KOERSEL(LIM)-B-16630',
+    'BLANKENBERGE(WVL)-A-1576',
+    'HEULE(WVL)-A-4938',
+    'PROSTITUEE-C-16287',
+    'MELSBROEK(VLB)-A-7428',
+    'DOORNIK(BEL)-A-3102',
+    'MARSEILLE(FRA)-C-15475',
+    'NIEUWPOORT(WVL)-B-19123',
+    'HOUTHALEN(LIM)-C-5137',
+    'KOKSIJDE(WVL)-A-6193'
+]
 
 
 class SearchEngine:
@@ -36,7 +52,7 @@ class SearchEngine:
                       os.path.join(database_path, 'WAAROM-A-13564.npy'),  # Not in corpus.
                       os.path.join(database_path, 'MELK-B-7418.npy'),  # Not in corpus.
                       os.path.join(database_path, 'VALENTIJN-A-16235.npy'),  # Not in corpus.
-                      os.path.join(database_path, 'HERFST-B-4897.npy'), # Not in corpus.
+                      os.path.join(database_path, 'HERFST-B-4897.npy'),  # Not in corpus.
                       os.path.join(database_path, 'VLIEGTUIG-B-13187.npy'),  # Not in corpus.
                       os.path.join(database_path, 'KLEPELBEL-A-1166.npy'),  # Not in corpus.
                       os.path.join(database_path, 'POES-G-9372.npy'),  # Not in corpus.
@@ -44,10 +60,17 @@ class SearchEngine:
                       os.path.join(database_path, 'VADER-G-8975.npy')]  # Not in corpus.
 
         all_db_entries: List[str] = sorted(glob.glob(os.path.join(database_path, '*.npy')))
+        random.seed(42)
+        random.shuffle(all_db_entries)
         index: int = 0
         while max_entries == -1 or len(db_entries) < max_entries:
             if all_db_entries[index] not in db_entries:  # I know, not ideal, but it'll have to do.
-                db_entries.append(all_db_entries[index])
+                # Additional check: for this demo we do not want to include numbers and some other glosses.
+                is_number = os.path.basename(all_db_entries[index]).split('-')[0].isnumeric()
+                otherwise_unwanted = os.path.basename(all_db_entries[index]).split('.')[0] in UNWANTED_GLOSSES
+                if not is_number and not otherwise_unwanted:
+                    print(all_db_entries[index])
+                    db_entries.append(all_db_entries[index])
             index += 1
         print(f'Collected {len(db_entries)} database entries.')
         for db_entry in db_entries:

@@ -111,6 +111,7 @@ let recordingTimeMS = 4000;
 
 let resultsDiv = document.getElementById("results");
 let continueButton = document.getElementById("continueButton");
+let continueButtonSameSign = document.getElementById("continueButtonSameSign");
 var spinner = document.getElementById("spinner");
 var exampleVideo = document.getElementById("example");
 var exampleGlossName = document.getElementById("exampleGlossName");
@@ -214,6 +215,21 @@ continueButton.addEventListener("click", () => {
     clipLandmarks = [];
     currentGlossIndex = random(0, glosses.length);
     updateGloss();
+}, false);
+
+continueButtonSameSign.addEventListener("click", () => {
+    for (var i = 0; i < 3; i++) {
+        for (var j = 0; j < 3; j++) {
+            var div = document.getElementById('row' + i + 'col' + j);
+            while(div.firstChild){
+                div.removeChild(div.firstChild);
+            }
+        }
+    }
+
+    startButton.disabled = false;
+
+    clipLandmarks = [];
 }, false);
 
 
