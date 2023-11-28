@@ -135,8 +135,8 @@ let glosses = [
     "Onthouden (To memorise)",
     "Wat (What)",
     "Vliegtuig (Airplane)",
-    "Bel (Bell)",
-    "Kat (Cat)",
+    "Klepelbel (Bell)",
+    "Poes (Cat)",
     "Moeder (Mother)",
     "Vader (Father)"
 ];
