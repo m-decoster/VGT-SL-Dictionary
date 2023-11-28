@@ -69,7 +69,6 @@ class SearchEngine:
                 is_number = os.path.basename(all_db_entries[index]).split('-')[0].isnumeric()
                 otherwise_unwanted = os.path.basename(all_db_entries[index]).split('.')[0] in UNWANTED_GLOSSES
                 if not is_number and not otherwise_unwanted:
-                    print(all_db_entries[index])
                     db_entries.append(all_db_entries[index])
             index += 1
         print(f'Collected {len(db_entries)} database entries.')
