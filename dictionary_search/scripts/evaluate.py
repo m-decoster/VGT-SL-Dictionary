@@ -1,9 +1,10 @@
 import argparse
 import dataclasses
 import glob
+import json
 import os
 import time
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 import numpy as np
 from dictionary_search_model import Model
@@ -62,7 +63,9 @@ def search(raw_keypoint_file: str, model: Model, k: int) -> Tuple[str, List[str]
     :param k: Top-k results will be returned.
     :return: The label of the keypoint file (ground truth) and the search results."""
     embedding: np.ndarray = model.get_embedding(np.load(raw_keypoint_file))
-    label: str = os.path.splitext(os.path.basename(raw_keypoint_file))[0].split('_')[-1]
+    with open(raw_keypoint_file.replace('npy', 'json')) as f:
+        d: Dict = json.load(f)
+        label: str = d['ground_truth']
     search_results: List[str] = get_results(embedding, k)
     return label, search_results
 
