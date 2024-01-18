@@ -6,6 +6,7 @@ import json
 import os
 import random
 import time
+from collections import Counter
 from typing import List, Tuple, Dict
 
 import numpy as np
@@ -52,10 +53,20 @@ def populate_db(database_path: str, max_entries: int):
     with open('/tmp/indices.txt', 'w') as f:
         f.writelines([str(i) + '\n' for i in indices])
     all_db_entries = list(np.array(all_db_entries)[indices])
+
+    unique_db_entries = []
+    unique_ids = set()
+    for entry in all_db_entries:
+        unique_id = entry.split('-')[-1]
+        if unique_id in unique_ids:
+            continue
+        unique_ids.add(unique_id)
+        unique_db_entries.append(entry)
+
     index: int = 0
-    while len(db_entries) < max_entries:
-        if all_db_entries[index] not in db_entries:  # I know, not ideal, but it'll have to do.
-            db_entries.append(all_db_entries[index])
+    while len(db_entries) < max_entries and index < len(unique_db_entries):
+        if unique_db_entries[index] not in db_entries:  # I know, not ideal, but it'll have to do.
+            db_entries.append(unique_db_entries[index])
         index += 1
     print(f'Collected {len(db_entries)} database entries.')
     for db_entry in db_entries:
@@ -81,12 +92,34 @@ def search(raw_keypoint_file: str, model: Model, k: int) -> Tuple[str, List[str]
 def get_results(embedding: np.ndarray, k: int) -> List[str]:
     distances: List[Tuple[float, int]] = []
     for i, key in enumerate(_DATABASE):
-        eucdist: float = np.linalg.norm(embedding - key.embedding)
+        dist: float = np.linalg.norm(embedding - key.embedding, ord=1)
 
-        distances.append((eucdist, i))
+        distances.append((dist, i))
     ordered = sorted(distances, key=lambda tup: tup[0])  # Sort by ascending distance.
     results: List[str] = [_DATABASE[i].gloss for i in [tup[1] for tup in ordered]][:k]
     return results  # Glosses, distances.
+
+    # distances: List[Tuple[float, int]] = []
+    #     for i, key in enumerate(_DATABASE):
+    #         dist: float = np.linalg.norm(embedding - key.embedding)
+    #
+    #         distances.append((eucdist, i))
+    #     ordered = sorted(distances, key=lambda tup: tup[0])  # Sort by ascending distance.
+    #     results: List[str] = [_DATABASE[i].gloss for i in [tup[1] for tup in ordered]][:k]
+    #     return results  # Glosses, distances.
+
+    # distances: List[Tuple[float, int]] = []
+    # embedding = embedding.copy()
+    # embedding = embedding / np.linalg.norm(embedding)
+    # for i, key in enumerate(_DATABASE):
+    #     key_embedding = key.embedding.copy()
+    #     key_embedding = key_embedding / np.linalg.norm(key_embedding)
+    #     cossim = np.dot(embedding, key_embedding)/ (np.linalg.norm(embedding) * np.linalg.norm(key_embedding))
+    #
+    #     distances.append((cossim, i))
+    # ordered = sorted(distances, key=lambda tup: -tup[0])  # Sort by descending similarity.
+    # results: List[str] = [_DATABASE[i].gloss for i in [tup[1] for tup in ordered]][:k]
+    # return results  # Glosses, distances.
 
 
 def print_list(array: np.ndarray, indices=(1, 2, 3, 5, 10, 20)) -> str:
@@ -99,7 +132,7 @@ def print_list(array: np.ndarray, indices=(1, 2, 3, 5, 10, 20)) -> str:
     return result
 
 
-def main(input_directory: str, db_directory: str, model_path: str, k: int, n: int):
+def evaluate(model_name: str, input_directory: str, db_directory: str, model_path: str, k: int, n: int):
     """Convert the videos in `input_directory` to embeddings with the model stored at `model_path` and write them to `output_directory`.
 
     :param input_directory: The path to the directory containing the dictionary videos.
@@ -108,78 +141,43 @@ def main(input_directory: str, db_directory: str, model_path: str, k: int, n: in
     :param k: The top-k accuracy will be computed.
     :param n: The maximum amount of database entries to compare to.
     """
+    output = []
+
     model: Model = Model(model_path)
 
     populate_db(db_directory, n)
 
     query_filenames: List[str] = glob.glob(os.path.join(input_directory, '*.npy'))
 
-    # Global accuracy.
-    start_time = time.time()
-    correct = np.zeros((k,))
-    total = 0
-    for filename in query_filenames:
-        label, results = search(filename, model, k)
-        for i, result in enumerate(results):
-            if result == label:
-                correct[i:] += 1
-        total += 1
-    print(f'Global top-{k} accuracy: {print_list(correct / total)}')
-    end_time = time.time()
-    print(f'Average look-up time: {1000 * (end_time - start_time) / len(query_filenames):.4f} ms')
 
     # In corpus versus not in corpus.
     incorpus = ['HEBBEN-A-4801', 'PAARD-A-8880', 'STRAAT-A-11560', 'HAAS-A-16146', 'TELEFONEREN-D-11870',
                 'HOND-A-5052', 'RUSTEN-B-10250', 'SCHOOL-A-10547', 'ONTHOUDEN-A-8420', 'WAT-A-13657']
     notincorpus = ['BOUWEN-G-1906', 'WAAROM-A-13564', 'MELK-B-7418', 'VALENTIJN-A-16235', 'HERFST-B-4897',
                    'VLIEGTUIG-B-13187', 'KLEPELBEL-A-1166', 'POES-G-9372', 'MOEDER-A-7676', 'VADER-G-8975']
-    correct_incorpus = np.zeros((k,))
-    correct_notincorpus = np.zeros((k,))
-    total_incorpus = 0
-    total_notincorpus = 0
-    for filename in query_filenames:
-        label, results = search(filename, model, k)
-        for i, result in enumerate(results):
-            if result == label:
-                if label in incorpus:
-                    correct_incorpus[i:] += 1
-                else:
-                    correct_notincorpus[i:] += 1
-        if label in incorpus:
-            total_incorpus += 1
-        else:
-            total_notincorpus += 1
-    print(f'In corpus top-{k} accuracy: {print_list(correct_incorpus / total_incorpus)}')
-    print(f'Not in corpus top-{k} accuracy: {print_list(correct_notincorpus / total_notincorpus)}')
 
     # Per class accuracy.
     correct = {label.gloss: np.zeros((k,)) for label in _DATABASE[:20]}
     total = {label.gloss: 0 for label in _DATABASE[:20]}
+    confusions = {label.gloss: Counter() for label in _DATABASE[:20]}
     for filename in query_filenames:
         label, results = search(filename, model, k)
         for i, result in enumerate(results):
-            if result == label:
-                correct[label][i:] += 1
-        total[label] += 1
-    for label in correct:
-        print(f'Label "{label}" ({total[label]} entries) top-{k} accuracy: {print_list(correct[label] / total[label])}')
+            confusions[label][result] += 1
 
-    # Write a file that can be parsed by pandas to generate all kinds of pretty plots with seaborn.
-    with open(args.output_file, 'w') as f:
-        writer = csv.writer(f)
-        writer.writerow(['query', ''])
+    print(model_name, 'WAT', confusions['WAT-A-13657'])
+    print(model_name, 'VLIEGTUIG', confusions['VLIEGTUIG-B-13187'])
+    print(model_name, 'TELEFONEREN', confusions['TELEFONEREN-D-11870'])
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    input_directory = '/home/mcdcoste/Documents/research/dagvandewetenschap2023/book/query_keypoints/'
+    db_directory_vgt = '/home/mcdcoste/Documents/research/dagvandewetenschap2023/book/db_embeddings_vgt'
+    model_vgt = '/home/mcdcoste/Documents/research/dagvandewetenschap2023/book/models/model_vgt.onnx'
 
-    parser.add_argument('input_directory', type=str, help='The path to the directory containing the query videos.')
-    parser.add_argument('db_directory', type=str,
-                        help='The path to the directory containing the database.')
-    parser.add_argument('model_path', type=str,
-                        help='The path to the model (that generates the embeddings) checkpoint.')
-    parser.add_argument('k', type=int, help='Compute top-k accuracy.')
-    parser.add_argument('n', type=int, help='Consider a maximum of n database entries to compare to.')
+    db_directory_autsl = '/home/mcdcoste/Documents/research/dagvandewetenschap2023/book/db_embeddings_autsl'
+    model_autsl = '/home/mcdcoste/Documents/research/dagvandewetenschap2023/book/models/model_autsl.onnx'
 
-    args = parser.parse_args()
-
-    main(args.input_directory, args.db_directory, args.model_path, args.k, args.n)
+    import tqdm
+    for n in tqdm.tqdm([100]):
+        evaluate('VGT', input_directory, db_directory_vgt, model_vgt, 1, n)
+        evaluate('AUTSL', input_directory, db_directory_autsl, model_autsl, 1, n)

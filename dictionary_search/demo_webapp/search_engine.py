@@ -1,6 +1,7 @@
 import dataclasses
 import glob
 import os
+import random
 from typing import List, Tuple
 
 import numpy as np
@@ -43,7 +44,13 @@ class SearchEngine:
                       os.path.join(database_path, 'MOEDER-A-7676.npy'),  # Not in corpus.
                       os.path.join(database_path, 'VADER-G-8975.npy')]  # Not in corpus.
 
-        all_db_entries: List[str] = sorted(glob.glob(os.path.join(database_path, '*.npy')))
+        all_db_entries: List[str] = glob.glob(os.path.join(database_path, '*.npy'))
+        indices = list(range(len(all_db_entries)))
+        random.seed(10)
+        random.shuffle(indices)
+        with open('/tmp/indices.txt', 'w') as f:
+            f.writelines([str(i) + '\n' for i in indices])
+        all_db_entries = list(np.array(all_db_entries)[indices])
         index: int = 0
         while max_entries == -1 or len(db_entries) < max_entries:
             if all_db_entries[index] not in db_entries:  # I know, not ideal, but it'll have to do.
