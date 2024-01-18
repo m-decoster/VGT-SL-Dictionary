@@ -89,36 +89,36 @@ def search(raw_keypoint_file: str, model: Model, k: int) -> Tuple[str, List[str]
 
 
 def get_results(embedding: np.ndarray, k: int) -> List[str]:
-    distances: List[Tuple[float, int]] = []
-    for i, key in enumerate(_DATABASE):
-        dist: float = np.linalg.norm(embedding - key.embedding, ord=1)
-
-        distances.append((dist, i))
-    ordered = sorted(distances, key=lambda tup: tup[0])  # Sort by ascending distance.
-    results: List[str] = [_DATABASE[i].gloss for i in [tup[1] for tup in ordered]][:k]
-    return results  # Glosses, distances.
-
     # distances: List[Tuple[float, int]] = []
-    #     for i, key in enumerate(_DATABASE):
-    #         dist: float = np.linalg.norm(embedding - key.embedding)
-    #
-    #         distances.append((eucdist, i))
-    #     ordered = sorted(distances, key=lambda tup: tup[0])  # Sort by ascending distance.
-    #     results: List[str] = [_DATABASE[i].gloss for i in [tup[1] for tup in ordered]][:k]
-    #     return results  # Glosses, distances.
-
-    # distances: List[Tuple[float, int]] = []
-    # embedding = embedding.copy()
-    # embedding = embedding / np.linalg.norm(embedding)
     # for i, key in enumerate(_DATABASE):
-    #     key_embedding = key.embedding.copy()
-    #     key_embedding = key_embedding / np.linalg.norm(key_embedding)
-    #     cossim = np.dot(embedding, key_embedding)/ (np.linalg.norm(embedding) * np.linalg.norm(key_embedding))
+    #     dist: float = np.linalg.norm(embedding - key.embedding, ord=1)
     #
-    #     distances.append((cossim, i))
-    # ordered = sorted(distances, key=lambda tup: -tup[0])  # Sort by descending similarity.
+    #     distances.append((dist, i))
+    # ordered = sorted(distances, key=lambda tup: tup[0])  # Sort by ascending distance.
     # results: List[str] = [_DATABASE[i].gloss for i in [tup[1] for tup in ordered]][:k]
     # return results  # Glosses, distances.
+
+    # distances: List[Tuple[float, int]] = []
+    # for i, key in enumerate(_DATABASE):
+    #     dist: float = np.linalg.norm(embedding - key.embedding)
+    #
+    #     distances.append((dist, i))
+    # ordered = sorted(distances, key=lambda tup: tup[0])  # Sort by ascending distance.
+    # results: List[str] = [_DATABASE[i].gloss for i in [tup[1] for tup in ordered]][:k]
+    # return results  # Glosses, distances.
+
+    distances: List[Tuple[float, int]] = []
+    embedding = embedding.copy()
+    embedding = embedding / np.linalg.norm(embedding)
+    for i, key in enumerate(_DATABASE):
+        key_embedding = key.embedding.copy()
+        key_embedding = key_embedding / np.linalg.norm(key_embedding)
+        cossim = np.dot(embedding, key_embedding)/ (np.linalg.norm(embedding) * np.linalg.norm(key_embedding))
+
+        distances.append((cossim, i))
+    ordered = sorted(distances, key=lambda tup: -tup[0])  # Sort by descending similarity.
+    results: List[str] = [_DATABASE[i].gloss for i in [tup[1] for tup in ordered]][:k]
+    return results  # Glosses, distances.
 
 
 def print_list(array: np.ndarray, indices=(1, 2, 3, 5, 10, 20)) -> str:
@@ -188,6 +188,6 @@ if __name__ == '__main__':
         outputs.extend(evaluate('VGT', input_directory, db_directory_vgt, model_vgt, 20, n))
         outputs.extend(evaluate('AUTSL', input_directory, db_directory_autsl, model_autsl, 20, n))
 
-    with open('/home/mcdcoste/Documents/PhD-Thesis/dictionary_results_l1.csv', 'w') as f:
+    with open('/home/mcdcoste/Documents/PhD-Thesis/dictionary_results_cossim.csv', 'w') as f:
         writer = csv.writer(f)
         writer.writerows(outputs)
