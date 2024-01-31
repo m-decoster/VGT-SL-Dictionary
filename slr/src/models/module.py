@@ -48,7 +48,7 @@ class Module(pl.LightningModule):
         # Model initialization.
         self.model = PoseFormer(self.d_pose, self.d_hidden, self.num_attention_layers, self.num_attention_heads,
                                 self.d_hidden * 2, dropout=self.pf_dropout, num_classes=self.num_classes,
-                                asl_features = kwargs['asl_features'])
+                                asl_features=kwargs['asl_features'])
 
         # Metrics.
         self.criterion = torch.nn.CrossEntropyLoss(label_smoothing=0.2)

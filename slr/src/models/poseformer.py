@@ -11,24 +11,8 @@ from .mean_std import (
     std_velocity,
 )
 
-lips_upper_outer_landmarks = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409]
-lips_lower_outer_landmarks = [146, 91, 181, 84, 17, 314, 405, 321, 375]
-lips_upper_inner_landmarks = [191, 80, 81, 82, 13, 312, 311, 310, 415]
-lips_lower_inner_landmarks = [95, 88, 178, 87, 14, 317, 402, 318, 324]
-lips_middle_landmarks = [78, 291, 308]
-lip_landmarks = (
-        lips_upper_outer_landmarks
-        + lips_lower_outer_landmarks
-        + lips_upper_inner_landmarks
-        + lips_lower_inner_landmarks
-        + lips_middle_landmarks
-)
-right_eye_landmarks = [33, 145, 153, 133, 159, 158]
-left_eye_landmarks = [263, 386, 385, 374, 380, 362]
-eye_landmarks = right_eye_landmarks + left_eye_landmarks
-pose_landmarks = [index + 489 for index in [0, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]]
-lh_landmarks = list(range(468, 489))
-rh_landmarks = list(range(522, 543))
+lh_landmarks = list(range(33, 33+21))
+rh_landmarks = list(range(33+21, 33+42))
 
 
 def _normalize(keypoints: torch.Tensor) -> torch.Tensor:
@@ -90,9 +74,6 @@ class FeatureProcessing(nn.Module):
             feature_list.append(lefth_vel)
             feature_list.append(righth_vel)
 
-            face_x_normalized = x_normalized[..., lip_landmarks, :2].contiguous().flatten(-2, -1)
-
-            feature_list.append(face_x_normalized)
             features = torch.cat(feature_list, dim=-1)
             return features
 
