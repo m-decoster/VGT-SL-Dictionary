@@ -47,7 +47,8 @@ class Module(pl.LightningModule):
 
         # Model initialization.
         self.model = PoseFormer(self.d_pose, self.d_hidden, self.num_attention_layers, self.num_attention_heads,
-                                self.d_hidden * 2, dropout=self.pf_dropout, num_classes=self.num_classes)
+                                self.d_hidden * 2, dropout=self.pf_dropout, num_classes=self.num_classes,
+                                asl_features = kwargs['asl_features'])
 
         # Metrics.
         self.criterion = torch.nn.CrossEntropyLoss(label_smoothing=0.2)
@@ -130,5 +131,6 @@ class Module(pl.LightningModule):
         parser.add_argument('--pf_dropout', type=float, default=0.2, help='PoseFormer dropout.')
         parser.add_argument('--d_hidden', type=int, help='Dimensionality of attention layers.', required=True)
         parser.add_argument('--d_pose', type=int, help='Number of input features for pose data.', required=True)
+        parser.add_argument('--asl_features', action='store_true', help='Enable this for the Kaggle model.')
 
         return parent_parser

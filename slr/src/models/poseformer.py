@@ -4,6 +4,32 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from .mean_std import (
+    mean,
+    mean_velocity,
+    std,
+    std_velocity,
+)
+
+lips_upper_outer_landmarks = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409]
+lips_lower_outer_landmarks = [146, 91, 181, 84, 17, 314, 405, 321, 375]
+lips_upper_inner_landmarks = [191, 80, 81, 82, 13, 312, 311, 310, 415]
+lips_lower_inner_landmarks = [95, 88, 178, 87, 14, 317, 402, 318, 324]
+lips_middle_landmarks = [78, 291, 308]
+lip_landmarks = (
+        lips_upper_outer_landmarks
+        + lips_lower_outer_landmarks
+        + lips_upper_inner_landmarks
+        + lips_lower_inner_landmarks
+        + lips_middle_landmarks
+)
+right_eye_landmarks = [33, 145, 153, 133, 159, 158]
+left_eye_landmarks = [263, 386, 385, 374, 380, 362]
+eye_landmarks = right_eye_landmarks + left_eye_landmarks
+pose_landmarks = [index + 489 for index in [0, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]]
+lh_landmarks = list(range(468, 489))
+rh_landmarks = list(range(522, 543))
+
 
 def _normalize(keypoints: torch.Tensor) -> torch.Tensor:
     # Input shape: (frames, batch, keypoints, coordinates).
@@ -29,8 +55,10 @@ def _normalize(keypoints: torch.Tensor) -> torch.Tensor:
 
 
 class FeatureProcessing(nn.Module):
-    def __init__(self):
+    def __init__(self, asl_features: bool = False):
         super(FeatureProcessing, self).__init__()
+
+        self.asl_features = asl_features
 
     def forward(self, pose_clips: torch.Tensor) -> torch.Tensor:
         # Input is a padded batch (pad value: NaN) containing multiple samples.
@@ -39,6 +67,34 @@ class FeatureProcessing(nn.Module):
         # In this module, we perform normalization and feature extraction.
 
         feature_list = []
+
+        if self.asl_features:
+            x = pose_clips
+            x_normalized = (x - mean.to(x.device)) / std.to(x.device)
+            lefth_x_normalized = x_normalized[..., lh_landmarks, :2].contiguous().flatten(-2, -1)
+            righth_x_normalized = x_normalized[..., rh_landmarks, :2].contiguous().flatten(-2, -1)
+
+            feature_list.append(lefth_x_normalized)
+            feature_list.append(righth_x_normalized)
+
+            velocity = x[:, 1:] - x[:, :-1]
+            velocity_normalized = (velocity - mean_velocity.to(x.device)) / std_velocity.to(x.device)
+            velocity_normalized = torch.cat([
+                torch.zeros_like(x[:, :1, ...]),
+                velocity_normalized
+            ], dim=1)
+
+            lefth_vel = velocity_normalized[..., lh_landmarks, :2].contiguous().flatten(-2, -1)
+            righth_vel = velocity_normalized[..., rh_landmarks, :2].contiguous().flatten(-2, -1)
+
+            feature_list.append(lefth_vel)
+            feature_list.append(righth_vel)
+
+            face_x_normalized = x_normalized[..., lip_landmarks, :2].contiguous().flatten(-2, -1)
+
+            feature_list.append(face_x_normalized)
+            features = torch.cat(feature_list, dim=-1)
+            return features
 
         # Normalization: shift and scale.
         pose_clips = _normalize(pose_clips)
@@ -252,9 +308,10 @@ class PoseFormer(nn.Module):
             pooling="cls",
             num_classes=250,
             lang_embedding_size=4,
+            asl_features=False,
     ):
         super().__init__()
-        self.feature_extractor = FeatureProcessing()
+        self.feature_extractor = FeatureProcessing(asl_features)
 
         self.embed_dim = embed_dim
         self.frame_embed = FrameEmbed(feature_size, embed_dim, dropout)
