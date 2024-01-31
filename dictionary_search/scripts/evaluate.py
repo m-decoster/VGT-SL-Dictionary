@@ -60,7 +60,10 @@ def populate_db(database_path: str, max_entries: int):
     print(f'Collected {len(db_entries)} database entries.')
     for db_entry in db_entries:
         label: str = os.path.splitext(os.path.basename(db_entry))[0]
-        _DATABASE.append(DatabaseEntry(np.load(db_entry), label))
+        try:
+            _DATABASE.append(DatabaseEntry(np.load(db_entry), label))
+        except ValueError:
+            print(db_entry)
 
 
 def search(raw_keypoint_file: str, model: Model, k: int) -> Tuple[str, List[str]]:
@@ -108,7 +111,7 @@ def main(input_directory: str, db_directory: str, model_path: str, k: int, n: in
     :param k: The top-k accuracy will be computed.
     :param n: The maximum amount of database entries to compare to.
     """
-    model: Model = Model(model_path)
+    model: Model = Model(model_path, False)
 
     populate_db(db_directory, n)
 

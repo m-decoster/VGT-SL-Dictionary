@@ -12,21 +12,38 @@ mp_holistic = mp.solutions.holistic
 class Model:
     """A pre-trained SLR model that can be used to extract embeddings."""
 
-    def __init__(self, model_path: str):
+    def __init__(self, model_path: str, face_first: bool = False):
         """Initialize the model.
 
         :param model_path: Path to the ONNX model file."""
         self.ort_session: onnxruntime.InferenceSession = onnxruntime.InferenceSession(model_path)
+        self.face_first = face_first
 
     def get_embedding(self, input_features: np.ndarray) -> np.ndarray:
         """Extract an embedding vector for given input features.
 
         :param input_features: The input features: an array of poses of shape (N, K, 3).
         :return: The output embedding."""
-        input_features = np.expand_dims(input_features, 1)  # Add empty batch axis.
-        input_features = input_features.astype(np.float32)  # Cast to 32-bit float (is: double).
-        input_features = input_features[:, :, :75, :]  # Drop face keypoints.
-        return self.ort_session.run(None, {'input': input_features})[0][0]  # Output is (1, 1, D).
+        if not self.face_first:
+            input_features = np.expand_dims(input_features, 1)  # Add empty batch axis.
+            input_features = input_features.astype(np.float32)  # Cast to 32-bit float (is: double).
+            input_features = input_features[:, :, :75, :]  # Drop face keypoints.
+            return self.ort_session.run(None, {'input': input_features})[0][0]  # Output is (1, 1, D).
+        else:  # Maxim's model.
+            input_features = input_features.astype(np.float32)
+            # Toon's keypoints are pose / face / left / right.
+            # Maxim's model expects face / left / pose / right.
+            # indices = np.arange(33, 33 + 468)  # Face.
+            # indices = np.concatenate([indices, np.arange(33 + 468, 33 + 468 + 21)], axis=0)  # Left.
+            # indices = np.concatenate([indices, np.arange(0, 33)], axis=0)  # Pose.
+            # indices = np.concatenate([indices, np.arange(33 + 468 + 21, 33 + 468 + 21 + 21)], axis=0)  # Right.
+            # INFERENCE: POSE LEFT RIGHT FACE.
+            indices = np.arange(75, 75+468)
+            indices = np.concatenate([indices, np.arange(33, 33+21)], axis=0)  # Left.
+            indices = np.concatenate([indices, np.arange(0, 33)], axis=0)  # Pose.
+            indices = np.concatenate([indices, np.arange(33+21, 33+42)], axis=0)  # Face.
+            input_features = input_features[:, indices]
+            return self.ort_session.run(None, {'input': input_features})[0][0]
 
 
 def load_video(video_path: str) -> np.ndarray:
