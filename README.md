@@ -4,7 +4,7 @@ At
 the [Dag Van De Wetenschap 2023](https://www.dagvandewetenschap.be/activiteiten/universiteit-gent-kunnen-computers-gebarentaal-begrijpen-op-locatie), [IDLab-AIRO](https://airo.ugent.be/)
 demonstrated a prototype of a search tool for the [VGT-NL](https://woordenboek.vlaamsegebarentaal.be/) dictionary.
 
-This prototype is based on [this paper](https://users.ugent.be/~mcdcoste/assets/2023095125.pdf), with an updated sign
+This prototype is based on [this paper](https://ieeexplore.ieee.org/document/10193531/), with an updated sign
 language recognition model that has better performance. A further notable improvement is obtained by
 running MediaPipe in the browser instead of the backend, leading to near-instant search results (down to tens
 of milliseconds from several seconds).
