@@ -105,23 +105,22 @@ def populate_db(database_path: str, max_entries: int):
         _DATABASE.append(DatabaseEntry(np.load(db_entry), label))
 
 
-def search(raw_keypoint_file: str, model: Model, model2: Model, k: int) -> Tuple[str, List[str]]:
+def search(raw_keypoint_file: str, model: Model, model2: Model) -> Tuple[str, List[str]]:
     """Search through the database with a given file containing keypoints.
 
     :param raw_keypoint_file: File containing keypoints.
     :param model: SLR model.
-    :param k: Top-k results will be returned.
     :return: The label of the keypoint file (ground truth) and the search results."""
     embedding1: np.ndarray = model.get_embedding(np.load(raw_keypoint_file))
     embedding2: np.ndarray = model2.get_embedding(np.load(raw_keypoint_file))
     with open(raw_keypoint_file.replace('npy', 'json')) as f:
         d: Dict = json.load(f)
         label: str = d['ground_truth']
-    search_results: List[str] = get_results(embedding1, embedding2, k)
+    search_results: List[str] = get_results(embedding1, embedding2)
     return label, search_results
 
 
-def get_results(embedding1: np.ndarray, embedding2, k: int) -> List[str]:
+def get_results(embedding1: np.ndarray, embedding2) -> List[str]:
     distances: List[List[float, int]] = []
     for i, key in enumerate(_DATABASE):
         eucdist: float = np.linalg.norm(embedding1 - key.embedding)
@@ -132,7 +131,7 @@ def get_results(embedding1: np.ndarray, embedding2, k: int) -> List[str]:
 
         distances[i] = [0.5 * (eucdist + distances[i][0]), i]
     ordered = sorted(distances, key=lambda tup: tup[0])  # Sort by ascending distance.
-    results: List[str] = [_DATABASE[i].gloss for i in [tup[1] for tup in ordered]][:k]
+    results: List[str] = [_DATABASE[i].gloss for i in [tup[1] for tup in ordered]]
     return results  # Glosses, distances.
 
 
@@ -165,15 +164,24 @@ def main(input_directory: str, db_directory: str, db_directory2, model_path_1: s
 
     # Global accuracy.
     start_time = time.time()
+    reciprocal_ranks = []  # MRR
     correct = np.zeros((k,))
     total = 0
     for filename in query_filenames:
-        label, results = search(filename, model1, model2, k)
+        label, results = search(filename, model1, model2)
+        found_result = False
         for i, result in enumerate(results):
             if result == label:
-                correct[i:] += 1
+                if i <= k:
+                    correct[i:] += 1
+                reciprocal_ranks.append(1 / (1 + i))
+                found_result = True
+        if not found_result:
+            reciprocal_ranks.append(0)
         total += 1
+    mrr = np.mean(reciprocal_ranks)
     print(f'Global top-{k} accuracy: {print_list(correct / total)}')
+    print(f'Mean Reciprocal Rank: {mrr}')
     end_time = time.time()
     print(f'Average look-up time: {1000 * (end_time - start_time) / len(query_filenames):.4f} ms')
 
@@ -187,13 +195,14 @@ def main(input_directory: str, db_directory: str, db_directory2, model_path_1: s
     total_incorpus = 0
     total_notincorpus = 0
     for filename in query_filenames:
-        label, results = search(filename, model1, model2, k)
+        label, results = search(filename, model1, model2)
         for i, result in enumerate(results):
-            if result == label:
-                if label in incorpus:
-                    correct_incorpus[i:] += 1
-                else:
-                    correct_notincorpus[i:] += 1
+            if i <= k:
+                if result == label:
+                    if label in incorpus:
+                        correct_incorpus[i:] += 1
+                    else:
+                        correct_notincorpus[i:] += 1
         if label in incorpus:
             total_incorpus += 1
         else:
@@ -205,10 +214,11 @@ def main(input_directory: str, db_directory: str, db_directory2, model_path_1: s
     correct = {label.gloss: np.zeros((k,)) for label in _DATABASE[:20]}
     total = {label.gloss: 0 for label in _DATABASE[:20]}
     for filename in query_filenames:
-        label, results = search(filename, model1, model2, k)
+        label, results = search(filename, model1, model2)
         for i, result in enumerate(results):
-            if result == label:
-                correct[label][i:] += 1
+            if i <= k:
+                if result == label:
+                    correct[label][i:] += 1
         total[label] += 1
     for label in correct:
         print(f'Label "{label}" ({total[label]} entries) top-{k} accuracy: {print_list(correct[label] / total[label])}')
