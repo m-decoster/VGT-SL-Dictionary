@@ -1,3 +1,8 @@
+# Search Functionality is now Live!
+
+The [search functionality in the VGT-Dutch dictionary](https://woordenboek.vlaamsegebarentaal.be/direct-record), a unique piece of software, is now available for free!
+It is based on a highly improved version of this demo, and was funded by amai! Vlaanderen as a co-created valorisation project.
+
 # Flemish Sign Language Dictionary Search Functionality Prototype
 
 At
